@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures=["mongodb"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+
+model User{
+    id        Int     @id @default(autoincrement())
+    name      String
+    lastName  String
+    password  String
+    isAdmin   Boolean @default(false)
+    email     String  @unique
+    image     String
+    movie     Movie[]
+    messages  Message[]
+    Chat      Message[] @relation("RecieverOfChat")
+
+}
+
+
+model Movie{
+    id            Int       @id @default(autoincrement())
+    name          String
+    type          String
+    description   String
+    image         String
+    rating        Int
+    updateAt      DateTime  @default(now())
+    user          User[]
+
+}
+
+// model UserOnMovie{
+//   user       User     @relation(fields: [userId], references: [id])
+//   userId     Int      @map("user_id")// relation scalar field (used in the `@relation` attribute above)
+//   movie      Movie    @relation(fields: [movieId], references: [id])
+//   movieId    Int      @map("movie_id")// relation scalar field (used in the `@relation` attribute above)
+
+
+//   @@id([userId, movieId])
+//    @@map("userOnMovie") 
+// }
+
+
+model Message{
+    id            Int       @id @default(autoincrement())
+    content       String
+    receiverId    Int
+    receiver      User  @relation("RecieverOfChat", fields: [receiverId], references: [id])
+    senderId      Int
+    sender        User  @relation(fields: [senderId], references: [id])
+    createdAt     DateTime @default(now())
+    
+}
+
